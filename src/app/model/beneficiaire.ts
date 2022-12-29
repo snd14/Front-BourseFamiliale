@@ -1,0 +1,23 @@
+export class Beneficiaire {
+     id;
+     reference;
+     categorie;
+     nom;
+     nomChefMenage;
+     nomPereChefMenage;
+     nomMereChefMenage;
+     cinChefMenage;
+     telephoneChefMenage;
+     telephone;
+     cin;
+     dateDelivrance;
+     dateExpiration;
+     lieuDelivrance;
+     adresse;
+     departement;
+     commune;
+     commVille;
+     quartierVillage;
+     solde;
+     status;
+}

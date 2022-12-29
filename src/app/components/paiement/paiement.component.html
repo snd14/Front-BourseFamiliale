@@ -1,0 +1,144 @@
+<p-toast></p-toast>
+<div class="card">
+    <h5>Rechercher un bénéficiaire</h5>
+
+    <p-toolbar styleClass="mb-5">
+        <div class="col-12 md:col-4">
+            <p-dropdown [options]="listeDesPeriodes" [(ngModel)]="periode_id" placeholder="Sélectionner une période"
+                         optionLabel="libelle" (onChange)="getChange()"></p-dropdown>
+            <!-- <ng-template let-evenement pTemplate="item">
+                <div class="flex align-items-center operatingSystems-item">
+                    <div>{{evenement.libelle}}</div>
+                    <div>{{evenement.annee}}</div>
+
+                </div>
+            </ng-template>  -->
+        </div>
+        <div class="col-12 md:col-4">
+
+                <input type="text" pInputText placeholder="Taper le numéro du bénéficiaire"
+                       cols="50" [(ngModel)]="reference" [disabled]="disabled" (ngModelChange)="getChange1()">
+
+        </div>
+        <div class="col-12 md:col-4">
+
+                 <button type="button" pButton pRipple label="Rechercher" (click)="verifierExistencePaiement()" [disabled]="disabled1"></button>
+
+        </div>
+    </p-toolbar>
+    <h5 style="text-align:center; color:red">{{messageErreur}}</h5>
+            <!-- si le beneficiaire est trouve -->
+    <div class="card" [hidden]="!displayResults">
+        <h5>Résultat</h5>
+        <p-tabView orientation="center" [(activeIndex)]="activeIndex1">
+            <h6 style="text-align:center; color:red">{{messageErreur2}}</h6>
+            <p-tabPanel header="INFOS" class="line-height-3 m-0">
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="firstname2">Nom du bénéficiaire</label>
+                        <input pInputText id="firstname" value="{{paiementTrouve?.beneficiaire?.nom}}" disabled type="text" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="firstname2">Date</label>
+                        <input pInputText id="firstname1" value="{{paiementTrouve?.date}}" disabled type="text" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="firstname2">Net à payer</label>
+                        <input pInputText id="firstname3" value="{{paiementTrouve?.netapayer}}" disabled type="text" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="firstname2">Téléphone</label>
+                        <input pInputText id="firstname4" value="{{paiementTrouve?.beneficiaire?.telephone}}" disabled type="text" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="firstname2">Région</label>
+                        <input pInputText id="firstname5" value="{{paiementTrouve?.beneficiaire?.departement?.region?.nom}}" disabled type="text" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="firstname2">Département</label>
+                        <input pInputText id="firstname6" value="{{paiementTrouve?.beneficiaire?.departement?.nom}}" disabled type="text" />
+                    </div>
+                </div>
+                <!-- Autres informations à afficher -->
+                <div style="text-align:center">
+                    <button style="text-align:center" pButton pRipple type="button" (click)="activeIndex1 = 1" label="Confirmer" class="p-button-raised p-button-info mr-2 mb-2"></button>
+                </div>
+
+            </p-tabPanel>
+            <p-tabPanel header="VALIDATION" class="line-height-3 m-0" [disabled]="true">
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="firstname2">Référence Virement</label>
+                        <input pInputText id="refvirement" type="text" value="{{paiementTrouve?.virementId}}" disabled />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="firstname2">CIN</label>
+                        <input pInputText id="cni" type="text" [(ngModel)]="cin"/>
+                    </div>
+<!--                    <div class="field col-12 md:col-6">-->
+<!--                        <label htmlFor="firstname2">Référence Virement</label>-->
+<!--                        <input pInputText id="firstname2" value="{{paiementTrouve?.virementId}}" disabled type="text" />-->
+<!--                    </div>-->
+<!--                    <div class="field col-12 md:col-6">-->
+<!--                        <label htmlFor="firstname2">CIN</label>-->
+<!--                        <input pInputText id="firstname2" value="{{paiementTrouve?.beneficiaire?.cin}}" disabled type="text" />-->
+<!--                    </div>-->
+                </div>
+                <div style="text-align:center">
+                    <button style="text-align:center" pButton pRipple type="button"  (click)="confirmerLePaiement()" (click)="activeIndex1 = valeurActiveIndex" label="VALIDER" class="p-button-raised p-button-info mr-2 mb-2"></button>
+                </div>
+            </p-tabPanel>
+            <p-tabPanel header="SIGNER" class="line-height-3 m-0" [disabled]="true">
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="firstname2">Référence Paiement</label>
+                        <input pInputText id="firstname0" [(ngModel)]="reference_pay" type="text" />
+                    </div>
+                </div>
+                <div style="text-align:center">
+                    <button style="text-align:center" pButton pRipple type="button"  label="SIGNER" class="p-button-raised p-button-info mr-2 mb-2"></button>
+                </div>
+            </p-tabPanel>
+        </p-tabView>
+
+    </div>
+    <div class="card" *ngIf="!paiementTrouve">
+        <p>Le Paiemet n\'existe pas</p>
+    </div>
+</div>
+
+<!-- <h5>Responsive</h5> -->
+<p-dialog header="Header" [(visible)]="displayVerificationDialog" [breakpoints]="{'960px': '75vw'}" [style]="{width: '50vw'}"
+    [draggable]="false" [resizable]="false">
+
+    <div class="p-fluid p-formgrid grid">
+        <div class="field col-12 md:col-6">
+            <label htmlFor="firstname2">Nom du bénéficiaire</label>
+            <input pInputText id="firstname" value="{{paiementTrouve?.beneficiaire?.nom}}" disabled type="text" />
+        </div>
+        <div class="field col-12 md:col-6">
+            <label htmlFor="firstname2">Téléphone</label>
+            <input pInputText id="firstname4" value="{{paiementTrouve?.beneficiaire?.telephone}}" disabled type="text" />
+        </div>
+        <div class="field col-12 md:col-6">
+            <label htmlFor="firstname2">Net à payer</label>
+            <input pInputText id="firstname3" value="{{paiementTrouve?.netapayer}}" disabled type="text" />
+        </div>
+        <div class="field col-12 md:col-6">
+            <label htmlFor="firstname2">Référence Virement</label>
+            <input pInputText id="firstname2" value="{{paiementTrouve?.virementId}}" disabled type="text" />
+        </div>
+    </div>
+        <div style="text-align:center">
+            <button pButton pRipple type="button" (click)="validerUnPaiement()" (click)="displayVerificationDialog=false" label="PAYER" class="p-button-success"></button>
+            <!--  -->
+        </div>
+
+</p-dialog>
+
+
+<div id="impression" *ngIf="0">
+    <div class="recu">
+        
+    </div>
+</div>

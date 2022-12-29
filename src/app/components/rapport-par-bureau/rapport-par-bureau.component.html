@@ -1,0 +1,173 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <div class="row espace">
+                <div class="col-sm">
+                    <h5 htmlFor="Date1">Date Début</h5>
+                    <input pInputText id="date1" type="Date" [(ngModel)]="date1" (change)="change()" />
+                </div>
+                <div class="col-sm">
+                    <h5 htmlFor="Date2">Date Fin</h5>
+                    <input pInputText id="date2" type="Date" [(ngModel)]="date2" [disabled]="disabled" (change)="change1()"/>
+                </div>
+                <!-- <div class="col-sm">
+                    <div class="p-field p-col" >
+                        <h5>Structure</h5>
+                        <p-dropdown [options]="bureaux" [(ngModel)]="bureau" placeholder="Structure" optionLabel="libelle" emptyMessage="Listes Vides"
+                                    [disabled]="disabled1" (onChange)="change2()" ></p-dropdown>
+
+                    </div>
+                </div> -->
+
+                <div class="col-sm margeTop">
+
+                    <p-button label="Rechercher" icon="pi pi-search" styleClass="mr-2 mb-2" [loading]="loading[0]" (onClick)="load(0)"
+                              [disabled]="disabled1" (onClick)="getListPaiement()"></p-button>
+<!--                              (click)="rechercheByDrp(date1, date2,bureau)" [disabled]="disabled2"></p-button>-->
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+<div class="grid" *ngIf="paiements">
+    <div class="col-12">
+        <div class="card">
+            <p-toolbar styleClass="mb-4" >
+
+                <ng-template pTemplate="right" >
+                    <button pButton pRipple label="Export exel" icon="pi pi-upload" class="mr-2 inline-block" (click)="exportExcel()"></button>
+                    <button pButton pRipple label="Export PDF" icon="pi pi-file-pdf" (click)="exportPdf()" class="p-button-warning mr-2"  tooltipPosition="bottom"></button>
+<!--                    <button pButton pRipple label="Export csv" icon="pi pi-upload" class="p-button-help" (click)="dt.exportCSV()"></button>-->
+                </ng-template>
+
+            </p-toolbar>
+            <!-- <p-toolbar styleClass="mb-4">
+
+                <ng-template *ngIf="!roleDrp" pTemplate="right">
+                    <button pButton pRipple label="Export exel" icon="pi pi-upload" class="mr-2 inline-block" (click)="exportExcel()"></button>
+                    <button pButton pRipple label="Export PDF" icon="pi pi-file-pdf" (click)="exportPdf()" class="p-button-warning mr-2"  tooltipPosition="bottom"></button>
+                    <b class="left"><u>DRP</u>: {{drp.libelle}} </b>
+                    <b class="left"> <u>Payés</u> : {{nombrePaiementsReussi}}</b>
+                    <b class="left"> <u>Annulés</u> : {{nombrePaiementsAnnule}}</b>
+                    <b class="left"> <u>Montant total</u> : {{montantTotal.toLocaleString('fr-FR')}} FCFA</b>
+                </ng-template>
+                <ng-template *ngIf="roleDrp" pTemplate="right">
+                    <button pButton pRipple label="Export exel" icon="pi pi-upload" class="mr-2 inline-block" (click)="exportExcel()"></button>
+                    <button pButton pRipple label="Export PDF" icon="pi pi-file-pdf" (click)="exportPdf()" class="p-button-warning mr-2"  tooltipPosition="bottom"></button>
+                    <b class="left"><u>DRP</u>: {{user.dg_structure.dg_drp.libelle}} </b>
+                    <b class="left"> <u>Payés</u> : {{nombrePaiementsReussi}}</b>
+                    <b class="left"> <u>Annulés</u> : {{nombrePaiementsAnnule}}</b>
+                    <b class="left"> <u>Montant total</u> : {{montantTotalDrp.toLocaleString('fr-FR')}} FCFA</b>
+                </ng-template>
+            </p-toolbar> -->
+
+            <div >
+                <p-toolbar styleClass="mb-4">
+                    <ng-template pTemplate="left">
+                        <b class="left"><u>Structure</u>: {{structure}} </b>
+                    </ng-template>
+
+                </p-toolbar>
+                <p-table #dt1 dataKey="id" [rows]="10"  [rowHover]="true" styleClass="p-datatable-gridlines" [paginator]="true"  [value]="paiements" responsiveLayout="scroll"
+                [globalFilterFields]="['montant','id','beneficiaire.nom']">
+                <ng-template pTemplate="caption">
+                    <div class="flex justify-content-between flex-column sm:flex-row col-3">
+                        <!-- <button pButton label="Clear" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt1)"></button> -->
+                        <span class="p-input-icon-left mb-2">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" #filter (input)="dt1.filterGlobal($event.target.value, 'contains')" placeholder="Search Keyword" class="w-full"/>
+                        </span>                                             
+                    </div>
+                </ng-template>
+                    <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="numeroRecu">Numero Reçu </th>
+                                <th pSortableColumn="datePaiement">Date Paiement </th>
+                                <th pSortableColumn="beneficiaire">Beneficiaire </th>
+                                <th pSortableColumn="idUser">Payeur </th>
+                                <th pSortableColumn="evenement">Periode </th>
+                                <th pSortableColumn="montant">Montant (FCFA) </th>
+                                <th pSortableColumn="statut">Statut </th>
+                            </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-paie >
+                        <tr >
+                            <td style="width:14%; min-width:10rem;">
+                                <span class="p-column-title">Name</span>
+                                {{paie.id}}
+                            </td>
+                            <td style="width:14%; min-width:10rem;">
+                                <span class="p-column-title">Name</span>
+                                {{paie.datePaiement | date: 'dd/MM/yyyy' }}
+                            </td>
+                            <td style="width:14%; min-width:10rem;">
+                                <span class="p-column-title">Name</span>
+                              {{paie.beneficiaire.nom}}
+                            </td>
+                            <td style="width:14%; min-width:10rem;">
+                                <span class="p-column-title">Name</span>
+                                {{paie.caissier}}
+                            </td>
+                            <td style="width:14%; min-width:8rem;">
+                                <span class="p-column-title">Periode</span>
+                                {{paie.periode.libelle}}
+       <!--                                {{resultRecherche.evenement.nomEvenement}}, {{resultRecherche.evenement.anneeCampagne}}-->
+                            </td>
+                            <td style="width:14%; min-width:8rem;">
+                                <span class="p-column-title">Montant</span>
+                                {{paie.montant.toLocaleString('fr-FR')}}
+                            </td>
+                            <td style="width:14%; min-width:8rem;">
+                                <span class="p-column-title">Statut</span>
+                                <p *ngIf="paie.status==true">PAYER</p>
+                                <p *ngIf="paie.status==false" class="p-error">NON PAYER</p>
+                    
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="7">Pas de Paiement</td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="summary">
+                        <div class="flex align-items-center justify-content-between">
+                            Total {{paiements ? paiements.length : 0 }} paiements.
+                        </div>
+                    </ng-template>
+                  <!--  <tbody *ngFor="let resultRecherche of resultRecherches">
+                        <tr *ngIf="resultatBureau.idBureau==resultRecherche.idBureau">
+                            <td>
+                                {{resultRecherche.id}}
+                            </td>
+                            <td>
+                                {{resultRecherche.datePaiement | date: 'dd/MM/yyyy' }}
+                            </td>
+                            <td>
+                                {{resultRecherche.detailBeneficiaire.beneficiaire.nomPrenom}}
+                            </td>
+                            <td>
+                                {{resultRecherche.idUser.prenom}} {{resultRecherche.idUser.nom}}
+                            </td>
+                            <td>
+                                {{resultRecherche.evenement.moisCampagne}}, {{resultRecherche.evenement.anneeCampagne}}
+                            </td>
+                            <td>
+                                {{resultRecherche.detailBeneficiaire.montant.toLocaleString('fr-FR')}}
+                            </td>
+                            <td>
+                                <p *ngIf="resultRecherche.detailBeneficiaire.statut.libelle=='PAYÉ'">{{resultRecherche.detailBeneficiaire.statut.libelle}}</p>
+                                <p *ngIf="resultRecherche.detailBeneficiaire.statut.libelle=='ANNULÉ'" class="p-error">{{resultRecherche.detailBeneficiaire.statut.libelle}}</p>
+                            </td>
+                        </tr>
+                    </tbody>-->
+                    </p-table>
+                <hr>
+            </div>
+        </div>
+    </div>
+</div>
